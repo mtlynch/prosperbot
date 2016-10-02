@@ -119,11 +119,14 @@ func TestRedisLogger(t *testing.T) {
 			redis:          &prepender,
 			clock:          mockClock{time.Date(2016, 2, 14, 12, 28, 15, 22, time.UTC)},
 		}
-		go redisLogger.Run()
-		for _, u := range tt.updates {
-			accountUpdates <- u
-		}
-		close(accountUpdates)
+
+		go func() {
+			for _, u := range tt.updates {
+				accountUpdates <- u
+			}
+			close(accountUpdates)
+		}()
+		redisLogger.Run()
 		if prepender.LRangeKey != redis.KeyAccountInformation {
 			t.Errorf("%s: unexpected key for LRange. got: %v, want: %v", tt.msg, prepender.LRangeKey, redis.KeyAccountInformation)
 		}
