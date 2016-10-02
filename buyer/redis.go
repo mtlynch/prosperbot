@@ -1,0 +1,63 @@
+package buyer
+
+import (
+	"encoding/json"
+	"log"
+
+	"github.com/mtlynch/gofn-prosper/types"
+
+	"github.com/mtlynch/prosperbot/redis"
+)
+
+type orderStatusLogger struct {
+	redis        redis.RedisSetter
+	orderUpdates <-chan types.OrderResponse
+	done         chan<- bool
+	clock        types.Clock
+}
+
+func NewOrderStatusLogger(orderUpdates <-chan types.OrderResponse) (orderStatusLogger, error) {
+	r, err := redis.New()
+	if err != nil {
+		return orderStatusLogger{}, err
+	}
+	done := make(chan bool)
+	return orderStatusLogger{
+		redis:        r,
+		orderUpdates: orderUpdates,
+		done:         done,
+		clock:        types.DefaultClock{},
+	}, nil
+}
+
+func (r orderStatusLogger) Run() {
+	for {
+		order, more := <-r.orderUpdates
+		if !more {
+			r.done <- true
+			return
+		}
+		log.Printf("new order update: %+v", order)
+
+		record := redis.OrderRecord{
+			Order:     order,
+			Timestamp: r.clock.Now(),
+		}
+		if err := r.saveOrderStatus(record); err != nil {
+			log.Printf("failed to save order status: %v", err)
+		}
+	}
+}
+
+func (r orderStatusLogger) saveOrderStatus(record redis.OrderRecord) error {
+	serialized, err := json.Marshal(record)
+	if err != nil {
+		return err
+	}
+	key := redis.KeyPrefixOrders + string(record.Order.OrderID)
+	_, err = r.redis.Set(key, string(serialized))
+	if err != nil {
+		return err
+	}
+	return nil
+}
