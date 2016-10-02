@@ -86,7 +86,7 @@ func TestRedisLogger(t *testing.T) {
 			updates:            []types.Note{noteA},
 			wantLPushCalled:    true,
 			wantEndState: map[string][]string{
-				"note:noteA": []string{noteASerializedNew},
+				"note:noteA": {noteASerializedNew},
 			},
 			msg: "any update should cause a save when no history exists",
 		},
@@ -95,41 +95,41 @@ func TestRedisLogger(t *testing.T) {
 			updates:            []types.Note{noteA, noteB},
 			wantLPushCalled:    true,
 			wantEndState: map[string][]string{
-				"note:noteA": []string{noteASerializedNew},
-				"note:noteB": []string{noteBSerialized},
+				"note:noteA": {noteASerializedNew},
+				"note:noteB": {noteBSerialized},
 			},
 			msg: "any update should cause a save when no history exists and multiple notes are found",
 		},
 		{
 			startingRedisState: map[string][]string{
-				"note:noteA": []string{noteASerializedOld},
+				"note:noteA": {noteASerializedOld},
 			},
 			updates:         []types.Note{noteA},
 			wantLPushCalled: false,
 			wantEndState: map[string][]string{
-				"note:noteA": []string{noteASerializedOld},
+				"note:noteA": {noteASerializedOld},
 			},
 			msg: "if there is a note update, but no change, don't push",
 		},
 		{
 			startingRedisState: map[string][]string{
-				"note:noteB": []string{noteBSerialized},
+				"note:noteB": {noteBSerialized},
 			},
 			updates:         []types.Note{noteB},
 			wantLPushCalled: false,
 			wantEndState: map[string][]string{
-				"note:noteB": []string{noteBSerialized},
+				"note:noteB": {noteBSerialized},
 			},
 			msg: "if there is a note update, but no change (including on a pointer field), don't push",
 		},
 		{
 			startingRedisState: map[string][]string{
-				"note:noteA": []string{noteASerializedOld},
+				"note:noteA": {noteASerializedOld},
 			},
 			updates:         []types.Note{noteAChanged},
 			wantLPushCalled: true,
 			wantEndState: map[string][]string{
-				"note:noteA": []string{noteAChangedSerialized, noteASerializedOld},
+				"note:noteA": {noteAChangedSerialized, noteASerializedOld},
 			},
 			msg: "if there is a note update with changes, push",
 		},

@@ -34,7 +34,7 @@ var (
 	orderAUpdate1 = types.OrderResponse{
 		OrderID: "id-a",
 		BidStatus: []types.BidStatus{
-			types.BidStatus{
+			{
 				BidRequest: types.BidRequest{
 					ListingID: types.ListingNumber(54321),
 					BidAmount: 25.0,
@@ -50,7 +50,7 @@ var (
 	orderAUpdate2 = types.OrderResponse{
 		OrderID: "id-a",
 		BidStatus: []types.BidStatus{
-			types.BidStatus{
+			{
 				BidRequest: types.BidRequest{
 					ListingID: types.ListingNumber(54321),
 					BidAmount: 25.0,
@@ -66,7 +66,7 @@ var (
 	orderB = types.OrderResponse{
 		OrderID: "id-b",
 		BidStatus: []types.BidStatus{
-			types.BidStatus{
+			{
 				BidRequest: types.BidRequest{
 					ListingID: types.ListingNumber(987654),
 					BidAmount: 37.50,
