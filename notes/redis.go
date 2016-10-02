@@ -178,7 +178,10 @@ func (r redisLogger) getLatestNoteState(n types.Note) (types.Note, error) {
 }
 
 func (r redisLogger) saveNoteState(n types.Note) error {
-	record := redis.NoteRecord{n, r.clock.Now()}
+	record := redis.NoteRecord{
+		Note:      n,
+		Timestamp: r.clock.Now(),
+	}
 	serialized, err := json.Marshal(record)
 	if err != nil {
 		return err
