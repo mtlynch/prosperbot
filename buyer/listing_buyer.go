@@ -33,7 +33,10 @@ func (lb listingBuyer) Run() {
 		},
 	}
 	for {
-		listing := <-lb.listings
+		listing, more := <-lb.listings
+		if !more {
+			return
+		}
 		// TODO: Do purchase filtering in a cleaner place
 		if !csf.Filter(listing) {
 			continue
