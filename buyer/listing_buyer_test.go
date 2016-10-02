@@ -42,7 +42,7 @@ func TestListingBuyer(t *testing.T) {
 	}{
 		{
 			listings: []types.Listing{
-				types.Listing{ListingNumber: listingIDA},
+				{ListingNumber: listingIDA},
 			},
 			emittedOrderIDs: []types.OrderID{orderIDA},
 			emittedErrs:     []error{nil},
@@ -50,8 +50,8 @@ func TestListingBuyer(t *testing.T) {
 		},
 		{
 			listings: []types.Listing{
-				types.Listing{ListingNumber: listingIDA},
-				types.Listing{ListingNumber: listingIDB},
+				{ListingNumber: listingIDA},
+				{ListingNumber: listingIDB},
 			},
 			emittedOrderIDs: []types.OrderID{orderIDA, orderIDB},
 			emittedErrs:     []error{nil, nil},
@@ -59,8 +59,8 @@ func TestListingBuyer(t *testing.T) {
 		},
 		{
 			listings: []types.Listing{
-				types.Listing{ListingNumber: listingIDA},
-				types.Listing{ListingNumber: listingIDB},
+				{ListingNumber: listingIDA},
+				{ListingNumber: listingIDB},
 			},
 			emittedOrderIDs: []types.OrderID{orderIDA, orderIDB},
 			emittedErrs:     []error{genericErr, nil},
