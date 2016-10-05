@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mtlynch/gofn-prosper/prosper"
 	"github.com/mtlynch/gofn-prosper/types"
 )
 
@@ -15,13 +16,13 @@ type mockNoteFetcher struct {
 	err   error
 }
 
-func (ls *mockNoteFetcher) Notes(offset, limit int) (types.NotesResponse, error) {
+func (ls *mockNoteFetcher) Notes(p prosper.NotesParams) (types.NotesResponse, error) {
 	ls.calls++
-	actualLimit := offset + limit
+	actualLimit := p.Offset + p.Limit
 	if actualLimit > len(ls.notes) {
 		actualLimit = len(ls.notes)
 	}
-	result := ls.notes[offset:actualLimit]
+	result := ls.notes[p.Offset:actualLimit]
 	return types.NotesResponse{
 		Result:      result,
 		ResultCount: len(result),

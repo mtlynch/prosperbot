@@ -27,7 +27,10 @@ func (np notePoller) Run() {
 				return
 			}
 			attempts++
-			response, err := np.nf.Notes(offset, limit)
+			response, err := np.nf.Notes(prosper.NotesParams{
+				Offset: offset,
+				Limit:  limit,
+			})
 			if err != nil {
 				log.Printf("failed to get new notes: %v", err)
 				continue
