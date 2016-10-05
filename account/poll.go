@@ -18,7 +18,7 @@ func Poll(updateInterval time.Duration, accounter prosper.Accounter) error {
 	go logger.Run()
 	go func() {
 		for {
-			a, err := accounter.Account()
+			a, err := accounter.Account(prosper.AccountParams{})
 			if err != nil {
 				log.Printf("failed to query account information: %v", err)
 			} else {
