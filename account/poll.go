@@ -5,12 +5,11 @@ import (
 	"time"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 func Poll(updateInterval time.Duration, accounter prosper.Accounter) error {
 	log.Printf("starting account polling")
-	accountUpdates := make(chan types.AccountInformation)
+	accountUpdates := make(chan prosper.AccountInformation)
 	logger, err := NewRedisLogger(accountUpdates)
 	if err != nil {
 		return err

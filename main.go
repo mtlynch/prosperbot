@@ -39,8 +39,8 @@ func main() {
 	c := prosper.NewClient(creds)
 	f := prosper.SearchFilter{
 		EstimatedReturn: types.Float64Range{Min: types.CreateFloat64(0.0849)},
-		ListingStatus:   []types.ListingStatus{types.ListingActive},
-		IncomeRange:     []types.IncomeRange{types.Between25kAnd50k, types.Between50kAnd75k, types.Between75kAnd100k, types.Over100k},
+		ListingStatus:   []prosper.ListingStatus{prosper.ListingActive},
+		IncomeRange:     []prosper.IncomeRange{prosper.Between25kAnd50k, prosper.Between50kAnd75k, prosper.Between75kAnd100k, prosper.Over100k},
 		// Re-enable when Prosper fixes their bug here.
 		/*PriorProsperLoansLatePaymentsOneMonthPlus: types.Int32Range{
 			Max: types.CreateInt32(0),
@@ -50,7 +50,7 @@ func main() {
 		},*/
 		InquiriesLast6Months: types.Int32Range{Max: types.CreateInt32(3)},
 		DtiWprosperLoan:      types.Float64Range{Max: types.CreateFloat64(0.4)},
-		ProsperRating:        []types.ProsperRating{types.RatingAA, types.RatingA, types.RatingB, types.RatingC, types.RatingD, types.RatingE},
+		Rating:               []prosper.Rating{prosper.RatingAA, prosper.RatingA, prosper.RatingB, prosper.RatingC, prosper.RatingD, prosper.RatingE},
 	}
 	buyer.Poll(1*time.Second, f, *isBuyingEnabled, &c)
 	account.Poll(1*time.Minute, &c)

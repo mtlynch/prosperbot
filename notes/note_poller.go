@@ -5,12 +5,11 @@ import (
 	"time"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 type notePoller struct {
 	nf           prosper.NoteFetcher
-	notes        chan<- types.Note
+	notes        chan<- prosper.Note
 	pollInterval time.Duration
 }
 
@@ -36,7 +35,7 @@ func (np notePoller) Run() {
 				continue
 			}
 			for _, note := range response.Result {
-				go func(n types.Note) {
+				go func(n prosper.Note) {
 					np.notes <- n
 				}(note)
 			}

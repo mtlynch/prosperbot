@@ -5,13 +5,14 @@ import (
 	"errors"
 	"log"
 
+	"github.com/mtlynch/gofn-prosper/prosper"
 	"github.com/mtlynch/gofn-prosper/types"
 
 	"github.com/mtlynch/prosperbot/redis"
 )
 
 type redisLogger struct {
-	accountUpdates <-chan types.AccountInformation
+	accountUpdates <-chan prosper.AccountInformation
 	redis          redis.RedisListPrepender
 	clock          types.Clock
 }
@@ -20,7 +21,7 @@ var (
 	errAccountInformationEmpty = errors.New("no account information available")
 )
 
-func accountInformationEqual(a, b types.AccountInformation) bool {
+func accountInformationEqual(a, b prosper.AccountInformation) bool {
 	if a.AvailableCashBalance != b.AvailableCashBalance {
 		return false
 	}
@@ -63,7 +64,7 @@ func accountInformationEqual(a, b types.AccountInformation) bool {
 	return true
 }
 
-func NewRedisLogger(updates <-chan types.AccountInformation) (redisLogger, error) {
+func NewRedisLogger(updates <-chan prosper.AccountInformation) (redisLogger, error) {
 	r, err := redis.New()
 	if err != nil {
 		return redisLogger{}, err
@@ -103,18 +104,18 @@ func (r redisLogger) Run() {
 	}
 }
 
-func (r redisLogger) getAccountInformation() (types.AccountInformation, error) {
+func (r redisLogger) getAccountInformation() (prosper.AccountInformation, error) {
 	accountSerialized, err := r.redis.LRange(redis.KeyAccountInformation, 0, 0)
 	if err != nil {
-		return types.AccountInformation{}, err
+		return prosper.AccountInformation{}, err
 	}
 	if len(accountSerialized) < 1 {
-		return types.AccountInformation{}, errAccountInformationEmpty
+		return prosper.AccountInformation{}, errAccountInformationEmpty
 	}
 	var record redis.AccountRecord
 	err = json.Unmarshal([]byte(accountSerialized[0]), &record)
 	if err != nil {
-		return types.AccountInformation{}, err
+		return prosper.AccountInformation{}, err
 	}
 	return record.Value, nil
 }

@@ -7,38 +7,37 @@ import (
 	"time"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 type mockNoteFetcher struct {
 	calls int
-	notes []types.Note
+	notes []prosper.Note
 	err   error
 }
 
-func (ls *mockNoteFetcher) Notes(p prosper.NotesParams) (types.NotesResponse, error) {
+func (ls *mockNoteFetcher) Notes(p prosper.NotesParams) (prosper.NotesResponse, error) {
 	ls.calls++
 	actualLimit := p.Offset + p.Limit
 	if actualLimit > len(ls.notes) {
 		actualLimit = len(ls.notes)
 	}
 	result := ls.notes[p.Offset:actualLimit]
-	return types.NotesResponse{
+	return prosper.NotesResponse{
 		Result:      result,
 		ResultCount: len(result),
 		TotalCount:  len(ls.notes),
 	}, ls.err
 }
 
-func makeNotes(count int) []types.Note {
-	notes := []types.Note{}
+func makeNotes(count int) []prosper.Note {
+	notes := []prosper.Note{}
 	for i := 0; i < count; i++ {
-		notes = append(notes, types.Note{ListingNumber: types.ListingNumber(i)})
+		notes = append(notes, prosper.Note{ListingNumber: prosper.ListingNumber(i)})
 	}
 	return notes
 }
 
-type ByListingNumber []types.Note
+type ByListingNumber []prosper.Note
 
 func (s ByListingNumber) Len() int {
 	return len(s)
@@ -54,7 +53,7 @@ func (s ByListingNumber) Less(i, j int) bool {
 
 func TestNotePoller(t *testing.T) {
 	var tests = []struct {
-		serverNotes []types.Note
+		serverNotes []prosper.Note
 		searchErr   error
 		wantCalls   int
 	}{
@@ -84,7 +83,7 @@ func TestNotePoller(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		notes := make(chan types.Note)
+		notes := make(chan prosper.Note)
 		noteFetcher := mockNoteFetcher{
 			notes: tt.serverNotes,
 			err:   tt.searchErr,
@@ -95,7 +94,7 @@ func TestNotePoller(t *testing.T) {
 			pollInterval: 10 * time.Second,
 		}
 		go notePoller.Run()
-		var gotNotes []types.Note
+		var gotNotes []prosper.Note
 		for i := 0; i < len(tt.serverNotes); i++ {
 			gotNotes = append(gotNotes, <-notes)
 		}

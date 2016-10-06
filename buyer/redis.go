@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/mtlynch/gofn-prosper/prosper"
 	"github.com/mtlynch/gofn-prosper/types"
 
 	"github.com/mtlynch/prosperbot/redis"
@@ -11,12 +12,12 @@ import (
 
 type orderStatusLogger struct {
 	redis        redis.RedisSetter
-	orderUpdates <-chan types.OrderResponse
+	orderUpdates <-chan prosper.OrderResponse
 	done         chan<- bool
 	clock        types.Clock
 }
 
-func NewOrderStatusLogger(orderUpdates <-chan types.OrderResponse) (orderStatusLogger, error) {
+func NewOrderStatusLogger(orderUpdates <-chan prosper.OrderResponse) (orderStatusLogger, error) {
 	r, err := redis.New()
 	if err != nil {
 		return orderStatusLogger{}, err

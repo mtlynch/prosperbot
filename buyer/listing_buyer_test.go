@@ -6,75 +6,75 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 )
 
 type mockBidPlacer struct {
-	gotListingID types.ListingNumber
+	gotListingID prosper.ListingNumber
 	gotBidAmount float64
-	orderIDs     types.OrderIDs
+	orderIDs     prosper.OrderIDs
 	errs         []error
 }
 
-func (bp *mockBidPlacer) PlaceBid(listingID types.ListingNumber, bidAmount float64) (types.OrderResponse, error) {
+func (bp *mockBidPlacer) PlaceBid(listingID prosper.ListingNumber, bidAmount float64) (prosper.OrderResponse, error) {
 	bp.gotListingID = listingID
 	bp.gotBidAmount = bidAmount
-	var orderID types.OrderID
+	var orderID prosper.OrderID
 	orderID, bp.orderIDs = bp.orderIDs[0], bp.orderIDs[1:]
 	var err error
 	err, bp.errs = bp.errs[0], bp.errs[1:]
-	return types.OrderResponse{OrderID: orderID}, err
+	return prosper.OrderResponse{OrderID: orderID}, err
 }
 
 var (
-	listingIDA = types.ListingNumber(123)
-	listingIDB = types.ListingNumber(456)
-	orderIDA   = types.OrderID("order-a")
-	orderIDB   = types.OrderID("order-b")
+	listingIDA = prosper.ListingNumber(123)
+	listingIDB = prosper.ListingNumber(456)
+	orderIDA   = prosper.OrderID("order-a")
+	orderIDB   = prosper.OrderID("order-b")
 	genericErr = errors.New("generic mock error")
 )
 
 func TestListingBuyer(t *testing.T) {
 	var tests = []struct {
-		listings        []types.Listing
-		emittedOrderIDs types.OrderIDs
+		listings        []prosper.Listing
+		emittedOrderIDs prosper.OrderIDs
 		emittedErrs     []error
-		wantOrderIDs    types.OrderIDs
+		wantOrderIDs    prosper.OrderIDs
 		msg             string
 	}{
 		{
-			listings: []types.Listing{
+			listings: []prosper.Listing{
 				{ListingNumber: listingIDA},
 			},
-			emittedOrderIDs: types.OrderIDs{orderIDA},
+			emittedOrderIDs: prosper.OrderIDs{orderIDA},
 			emittedErrs:     []error{nil},
-			wantOrderIDs:    types.OrderIDs{orderIDA},
+			wantOrderIDs:    prosper.OrderIDs{orderIDA},
 			msg:             "single listing should result in single order ID",
 		},
 		{
-			listings: []types.Listing{
+			listings: []prosper.Listing{
 				{ListingNumber: listingIDA},
 				{ListingNumber: listingIDB},
 			},
-			emittedOrderIDs: types.OrderIDs{orderIDA, orderIDB},
+			emittedOrderIDs: prosper.OrderIDs{orderIDA, orderIDB},
 			emittedErrs:     []error{nil, nil},
-			wantOrderIDs:    types.OrderIDs{orderIDA, orderIDB},
+			wantOrderIDs:    prosper.OrderIDs{orderIDA, orderIDB},
 			msg:             "two listings should result in two order IDs",
 		},
 		{
-			listings: []types.Listing{
+			listings: []prosper.Listing{
 				{ListingNumber: listingIDA},
 				{ListingNumber: listingIDB},
 			},
-			emittedOrderIDs: types.OrderIDs{orderIDA, orderIDB},
+			emittedOrderIDs: prosper.OrderIDs{orderIDA, orderIDB},
 			emittedErrs:     []error{genericErr, nil},
-			wantOrderIDs:    types.OrderIDs{orderIDB},
+			wantOrderIDs:    prosper.OrderIDs{orderIDB},
 			msg:             "failed orders should not be reported",
 		},
 	}
 	for _, tt := range tests {
-		listings := make(chan types.Listing)
-		orderIDs := make(chan types.OrderID)
+		listings := make(chan prosper.Listing)
+		orderIDs := make(chan prosper.OrderID)
 		bidPlacer := mockBidPlacer{
 			orderIDs: tt.emittedOrderIDs,
 			errs:     tt.emittedErrs,
@@ -91,7 +91,7 @@ func TestListingBuyer(t *testing.T) {
 			close(listings)
 		}()
 		buyer.Run()
-		gotOrderIDs := types.OrderIDs{}
+		gotOrderIDs := prosper.OrderIDs{}
 		for i := 0; i < len(tt.wantOrderIDs); i++ {
 			gotOrderIDs = append(gotOrderIDs, <-orderIDs)
 		}

@@ -3,20 +3,20 @@ package redis
 import (
 	"time"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 )
 
 type (
 	AccountRecord struct {
-		Value     types.AccountInformation
+		Value     prosper.AccountInformation
 		Timestamp time.Time
 	}
 	NoteRecord struct {
-		Note      types.Note
+		Note      prosper.Note
 		Timestamp time.Time
 	}
 	OrderRecord struct {
-		Order     types.OrderResponse
+		Order     prosper.OrderResponse
 		Timestamp time.Time
 	}
 )

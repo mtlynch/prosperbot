@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 
 	"github.com/mtlynch/prosperbot/redis"
 )
 
 type seenListingFilter struct {
-	listings    <-chan types.Listing
-	newListings chan<- types.Listing
+	listings    <-chan prosper.Listing
+	newListings chan<- prosper.Listing
 	redis       redis.RedisSetNXer
 }
 
-func NewSeenListingFilter(listings <-chan types.Listing, newListings chan<- types.Listing) (seenListingFilter, error) {
+func NewSeenListingFilter(listings <-chan prosper.Listing, newListings chan<- prosper.Listing) (seenListingFilter, error) {
 	r, err := redis.New()
 	if err != nil {
 		return seenListingFilter{}, err
@@ -44,7 +44,7 @@ func (r seenListingFilter) Run() {
 	}
 }
 
-func (r seenListingFilter) saveListing(listing types.Listing) (isNew bool, err error) {
+func (r seenListingFilter) saveListing(listing prosper.Listing) (isNew bool, err error) {
 	serialized, err := json.Marshal(listing)
 	if err != nil {
 		return false, err

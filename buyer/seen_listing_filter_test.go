@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 )
 
 type mockRedisSetNXer struct {
@@ -26,34 +26,34 @@ func (r *mockRedisSetNXer) SetNX(key string, value interface{}) (bool, error) {
 }
 
 var (
-	listingA = types.Listing{ListingNumber: 123}
-	listingB = types.Listing{ListingNumber: 456}
+	listingA = prosper.Listing{ListingNumber: 123}
+	listingB = prosper.Listing{ListingNumber: 456}
 )
 
 func TestSeenListingFilter(t *testing.T) {
 	var tests = []struct {
 		redisStartingValues map[string]string
 		redisErr            error
-		listings            []types.Listing
-		wantNewListings     []types.Listing
+		listings            []prosper.Listing
+		wantNewListings     []prosper.Listing
 		msg                 string
 	}{
 		{
 			redisStartingValues: make(map[string]string),
-			listings:            []types.Listing{listingA},
-			wantNewListings:     []types.Listing{listingA},
+			listings:            []prosper.Listing{listingA},
+			wantNewListings:     []prosper.Listing{listingA},
 			msg:                 "new listing should pass filter",
 		},
 		{
 			redisStartingValues: make(map[string]string),
-			listings:            []types.Listing{listingA, listingA, listingA},
-			wantNewListings:     []types.Listing{listingA},
+			listings:            []prosper.Listing{listingA, listingA, listingA},
+			wantNewListings:     []prosper.Listing{listingA},
 			msg:                 "repeated instances of same listing should not pass filter",
 		},
 		{
 			redisStartingValues: make(map[string]string),
-			listings:            []types.Listing{listingA, listingB, listingA},
-			wantNewListings:     []types.Listing{listingA, listingB},
+			listings:            []prosper.Listing{listingA, listingB, listingA},
+			wantNewListings:     []prosper.Listing{listingA, listingB},
 			msg:                 "repeated instances of same listing should not pass filter",
 		},
 		{
@@ -61,14 +61,14 @@ func TestSeenListingFilter(t *testing.T) {
 				"listing:123": "dummy serialized listing",
 				"listing:456": "dummy serialized listing",
 			},
-			listings:        []types.Listing{listingA, listingB},
-			wantNewListings: []types.Listing{},
+			listings:        []prosper.Listing{listingA, listingB},
+			wantNewListings: []prosper.Listing{},
 			msg:             "previously seen listings should not pass filter",
 		},
 	}
 	for _, tt := range tests {
-		listings := make(chan types.Listing)
-		newListings := make(chan types.Listing)
+		listings := make(chan prosper.Listing)
+		newListings := make(chan prosper.Listing)
 		setNXer := mockRedisSetNXer{
 			values: tt.redisStartingValues,
 			err:    tt.redisErr,
@@ -82,7 +82,7 @@ func TestSeenListingFilter(t *testing.T) {
 		for _, u := range tt.listings {
 			listings <- u
 		}
-		gotNewListings := []types.Listing{}
+		gotNewListings := []prosper.Listing{}
 		for i := 0; i < len(tt.wantNewListings); i++ {
 			gotNewListings = append(gotNewListings, <-newListings)
 		}

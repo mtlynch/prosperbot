@@ -3,22 +3,23 @@ package buyer
 import (
 	"testing"
 
+	"github.com/mtlynch/gofn-prosper/prosper"
 	"github.com/mtlynch/gofn-prosper/types"
 )
 
 func TestClientSideFilter(t *testing.T) {
 	var tests = []struct {
-		listing types.Listing
+		listing prosper.Listing
 		filter  ClientSideFilter
 		want    bool
 	}{
 		{
-			listing: types.Listing{},
+			listing: prosper.Listing{},
 			filter:  ClientSideFilter{},
 			want:    true,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				PriorProsperLoansLatePaymentsOneMonthPlus: 5,
 			},
 			filter: ClientSideFilter{
@@ -27,7 +28,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: false,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				PriorProsperLoansLatePaymentsOneMonthPlus: 1,
 			},
 			filter: ClientSideFilter{
@@ -36,7 +37,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: false,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				PriorProsperLoansLatePaymentsOneMonthPlus: 2,
 			},
 			filter: ClientSideFilter{
@@ -45,7 +46,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: true,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				PriorProsperLoansLatePaymentsOneMonthPlus: 6,
 			},
 			filter: ClientSideFilter{
@@ -54,7 +55,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: true,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				PriorProsperLoansBalanceOutstanding: 100.0,
 			},
 			filter: ClientSideFilter{
@@ -63,7 +64,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: false,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				CurrentDelinquencies: 3,
 			},
 			filter: ClientSideFilter{
@@ -72,7 +73,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: false,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				InquiriesLast6Months: 3,
 			},
 			filter: ClientSideFilter{
@@ -81,7 +82,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: false,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				EmploymentStatusDescription: "Has a great job",
 			},
 			filter: ClientSideFilter{
@@ -90,7 +91,7 @@ func TestClientSideFilter(t *testing.T) {
 			want: true,
 		},
 		{
-			listing: types.Listing{
+			listing: prosper.Listing{
 				EmploymentStatusDescription: "Unemployed",
 			},
 			filter: ClientSideFilter{
