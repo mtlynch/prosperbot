@@ -7,8 +7,8 @@ import (
 	"reflect"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 
+	"github.com/mtlynch/prosperbot/clock"
 	"github.com/mtlynch/prosperbot/redis"
 )
 
@@ -16,7 +16,7 @@ type redisLogger struct {
 	noteUpdates <-chan prosper.Note
 	done        chan<- bool
 	redis       redis.RedisListPrepender
-	clock       types.Clock
+	clock       clock.Clock
 }
 
 func newRedisLogger(noteUpdates <-chan prosper.Note) (redisLogger, error) {
@@ -27,7 +27,7 @@ func newRedisLogger(noteUpdates <-chan prosper.Note) (redisLogger, error) {
 	return redisLogger{
 		noteUpdates: noteUpdates,
 		redis:       r,
-		clock:       types.DefaultClock{},
+		clock:       clock.DefaultClock{},
 	}, nil
 }
 
@@ -128,7 +128,7 @@ func NewRedisLogger(updates <-chan prosper.Note) (redisLogger, error) {
 		noteUpdates: updates,
 		done:        done,
 		redis:       r,
-		clock:       types.DefaultClock{},
+		clock:       clock.DefaultClock{},
 	}, nil
 }
 

@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
+
+	"github.com/mtlynch/prosperbot/clock"
 )
 
 // TODO: Add support in Polling for excluding based on a blacklist of
@@ -22,7 +23,7 @@ func Poll(checkInterval time.Duration, f prosper.SearchFilter, isBuyingEnabled b
 		searchFilter: f,
 		listings:     allListings,
 		pollInterval: checkInterval,
-		clock:        types.DefaultClock{},
+		clock:        clock.DefaultClock{},
 	}
 	seenFilter, err := NewSeenListingFilter(allListings, newListings)
 	if err != nil {

@@ -6,15 +6,15 @@ import (
 	"log"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 
+	"github.com/mtlynch/prosperbot/clock"
 	"github.com/mtlynch/prosperbot/redis"
 )
 
 type redisLogger struct {
 	accountUpdates <-chan prosper.AccountInformation
 	redis          redis.RedisListPrepender
-	clock          types.Clock
+	clock          clock.Clock
 }
 
 var (
@@ -72,7 +72,7 @@ func NewRedisLogger(updates <-chan prosper.AccountInformation) (redisLogger, err
 	return redisLogger{
 		accountUpdates: updates,
 		redis:          r,
-		clock:          types.DefaultClock{},
+		clock:          clock.DefaultClock{},
 	}, nil
 }
 

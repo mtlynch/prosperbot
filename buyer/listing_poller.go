@@ -6,6 +6,8 @@ import (
 
 	"github.com/mtlynch/gofn-prosper/prosper"
 	"github.com/mtlynch/gofn-prosper/types"
+
+	"github.com/mtlynch/prosperbot/clock"
 )
 
 type listingPoller struct {
@@ -13,7 +15,7 @@ type listingPoller struct {
 	searchFilter prosper.SearchFilter
 	listings     chan<- prosper.Listing
 	pollInterval time.Duration
-	clock        types.Clock
+	clock        clock.Clock
 }
 
 // Maximum number of attempts before we give up on the listing poll attempt.
