@@ -10,15 +10,11 @@ import (
 )
 
 type mockBidPlacer struct {
-	gotListingID prosper.ListingNumber
-	gotBidAmount float64
-	orderIDs     prosper.OrderIDs
-	errs         []error
+	orderIDs prosper.OrderIDs
+	errs     []error
 }
 
-func (bp *mockBidPlacer) PlaceBid(listingID prosper.ListingNumber, bidAmount float64) (prosper.OrderResponse, error) {
-	bp.gotListingID = listingID
-	bp.gotBidAmount = bidAmount
+func (bp *mockBidPlacer) PlaceBid(b prosper.BidRequest) (prosper.OrderResponse, error) {
 	var orderID prosper.OrderID
 	orderID, bp.orderIDs = bp.orderIDs[0], bp.orderIDs[1:]
 	var err error
