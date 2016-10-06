@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/mtlynch/gofn-prosper/interval"
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 
 	"github.com/mtlynch/prosperbot/clock"
 )
@@ -29,7 +29,7 @@ func (lp listingPoller) Run() {
 		excludeListingsInvested := true
 		timeCutoff := lp.clock.Now().UTC().Add(-1 * time.Minute)
 		filter := lp.searchFilter
-		filter.ListingStartDate = types.TimeRange{Min: &timeCutoff}
+		filter.ListingStartDate = interval.TimeRange{Min: &timeCutoff}
 
 		for {
 			if attempts >= MaxAttempts {

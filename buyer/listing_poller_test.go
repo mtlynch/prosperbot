@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mtlynch/gofn-prosper/interval"
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 type mockListingSearcher struct {
@@ -64,43 +64,43 @@ func TestListingPoller(t *testing.T) {
 		{
 			serverListings: makeListings(1),
 			searchFilter: prosper.SearchFilter{
-				ListingStartDate: types.TimeRange{Min: &mockTimeOneMinAgo},
+				ListingStartDate: interval.TimeRange{Min: &mockTimeOneMinAgo},
 			},
 			wantCalls: 1,
 		},
 		{
 			serverListings: makeListings(50),
 			searchFilter: prosper.SearchFilter{
-				ListingStartDate: types.TimeRange{Min: &mockTimeOneMinAgo},
+				ListingStartDate: interval.TimeRange{Min: &mockTimeOneMinAgo},
 			},
 			wantCalls: 1,
 		},
 		{
 			serverListings: makeListings(51),
 			searchFilter: prosper.SearchFilter{
-				ListingStartDate: types.TimeRange{Min: &mockTimeOneMinAgo},
+				ListingStartDate: interval.TimeRange{Min: &mockTimeOneMinAgo},
 			},
 			wantCalls: 2,
 		},
 		{
 			serverListings: makeListings(100),
 			searchFilter: prosper.SearchFilter{
-				ListingStartDate: types.TimeRange{Min: &mockTimeOneMinAgo},
+				ListingStartDate: interval.TimeRange{Min: &mockTimeOneMinAgo},
 			},
 			wantCalls: 2,
 		},
 		{
 			serverListings: makeListings(101),
 			searchFilter: prosper.SearchFilter{
-				ListingStartDate: types.TimeRange{Min: &mockTimeOneMinAgo},
+				ListingStartDate: interval.TimeRange{Min: &mockTimeOneMinAgo},
 			},
 			wantCalls: 3,
 		},
 		{
 			serverListings: makeListings(1),
 			searchFilter: prosper.SearchFilter{
-				EstimatedReturn:  types.NewFloat64Range(0.05, 0.06),
-				ListingStartDate: types.TimeRange{Min: &mockTimeOneMinAgo},
+				EstimatedReturn:  interval.NewFloat64Range(0.05, 0.06),
+				ListingStartDate: interval.TimeRange{Min: &mockTimeOneMinAgo},
 			},
 			wantCalls: 1,
 		},

@@ -3,8 +3,8 @@ package buyer
 import (
 	"testing"
 
+	"github.com/mtlynch/gofn-prosper/interval"
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 func TestClientSideFilter(t *testing.T) {
@@ -23,7 +23,7 @@ func TestClientSideFilter(t *testing.T) {
 				PriorProsperLoansLatePaymentsOneMonthPlus: 5,
 			},
 			filter: ClientSideFilter{
-				PriorProsperLoansLatePaymentsOneMonthPlus: types.NewInt32Range(0, 4),
+				PriorProsperLoansLatePaymentsOneMonthPlus: interval.NewInt32Range(0, 4),
 			},
 			want: false,
 		},
@@ -32,7 +32,7 @@ func TestClientSideFilter(t *testing.T) {
 				PriorProsperLoansLatePaymentsOneMonthPlus: 1,
 			},
 			filter: ClientSideFilter{
-				PriorProsperLoansLatePaymentsOneMonthPlus: types.NewInt32Range(2, 6),
+				PriorProsperLoansLatePaymentsOneMonthPlus: interval.NewInt32Range(2, 6),
 			},
 			want: false,
 		},
@@ -41,7 +41,7 @@ func TestClientSideFilter(t *testing.T) {
 				PriorProsperLoansLatePaymentsOneMonthPlus: 2,
 			},
 			filter: ClientSideFilter{
-				PriorProsperLoansLatePaymentsOneMonthPlus: types.NewInt32Range(2, 6),
+				PriorProsperLoansLatePaymentsOneMonthPlus: interval.NewInt32Range(2, 6),
 			},
 			want: true,
 		},
@@ -50,7 +50,7 @@ func TestClientSideFilter(t *testing.T) {
 				PriorProsperLoansLatePaymentsOneMonthPlus: 6,
 			},
 			filter: ClientSideFilter{
-				PriorProsperLoansLatePaymentsOneMonthPlus: types.NewInt32Range(2, 6),
+				PriorProsperLoansLatePaymentsOneMonthPlus: interval.NewInt32Range(2, 6),
 			},
 			want: true,
 		},
@@ -59,7 +59,7 @@ func TestClientSideFilter(t *testing.T) {
 				PriorProsperLoansBalanceOutstanding: 100.0,
 			},
 			filter: ClientSideFilter{
-				PriorProsperLoansBalanceOutstanding: types.NewFloat64Range(105.0, 106.0),
+				PriorProsperLoansBalanceOutstanding: interval.NewFloat64Range(105.0, 106.0),
 			},
 			want: false,
 		},
@@ -68,7 +68,7 @@ func TestClientSideFilter(t *testing.T) {
 				CurrentDelinquencies: 3,
 			},
 			filter: ClientSideFilter{
-				CurrentDelinquencies: types.NewInt32Range(0, 2),
+				CurrentDelinquencies: interval.NewInt32Range(0, 2),
 			},
 			want: false,
 		},
@@ -77,7 +77,7 @@ func TestClientSideFilter(t *testing.T) {
 				InquiriesLast6Months: 3,
 			},
 			filter: ClientSideFilter{
-				InquiriesLast6Months: types.NewInt32Range(0, 2),
+				InquiriesLast6Months: interval.NewInt32Range(0, 2),
 			},
 			want: false,
 		},
