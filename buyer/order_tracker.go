@@ -4,15 +4,14 @@ import (
 	"log"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 type orderStatusQueryWorker struct {
 	querier      prosper.OrderStatusQuerier
-	orderUpdates chan<- types.OrderResponse
+	orderUpdates chan<- prosper.OrderResponse
 }
 
-func (qw orderStatusQueryWorker) QueryUntilComplete(orderID types.OrderID) {
+func (qw orderStatusQueryWorker) QueryUntilComplete(orderID prosper.OrderID) {
 	retries := 3
 	for {
 		if retries == 0 {
@@ -26,7 +25,7 @@ func (qw orderStatusQueryWorker) QueryUntilComplete(orderID types.OrderID) {
 		}
 		go func() { qw.orderUpdates <- response }()
 
-		if response.OrderStatus == types.OrderCompleted || response.BidStatus[0].Result != types.NoBidResult {
+		if response.OrderStatus == prosper.OrderCompleted || response.BidStatus[0].Result != prosper.NoBidResult {
 			log.Printf("order %v is complete: %v", orderID, response)
 			return
 		}
@@ -35,8 +34,8 @@ func (qw orderStatusQueryWorker) QueryUntilComplete(orderID types.OrderID) {
 
 type orderTracker struct {
 	querier      prosper.OrderStatusQuerier
-	orders       <-chan types.OrderID
-	orderUpdates chan<- types.OrderResponse
+	orders       <-chan prosper.OrderID
+	orderUpdates chan<- prosper.OrderResponse
 }
 
 func (ot orderTracker) Run() {

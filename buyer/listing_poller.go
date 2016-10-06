@@ -11,7 +11,7 @@ import (
 type listingPoller struct {
 	s            prosper.ListingSearcher
 	searchFilter prosper.SearchFilter
-	listings     chan<- types.Listing
+	listings     chan<- prosper.Listing
 	pollInterval time.Duration
 	clock        types.Clock
 }

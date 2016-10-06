@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 )
 
 type mockRedisListPrepender struct {
@@ -53,18 +53,18 @@ func (c mockClock) Now() time.Time {
 }
 
 const (
-	noteASerializedOld     = `{"Note":{"AgeInMonths":0,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteA","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":null,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"ProsperRating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-04T23:19:22.000000022Z"}`
-	noteASerializedNew     = `{"Note":{"AgeInMonths":0,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteA","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":null,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"ProsperRating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-05T11:40:15.000000022Z"}`
-	noteAChangedSerialized = `{"Note":{"AgeInMonths":1,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteA","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":null,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"ProsperRating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-05T11:40:15.000000022Z"}`
-	noteBSerialized        = `{"Note":{"AgeInMonths":0,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteB","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":2,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"ProsperRating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-05T11:40:15.000000022Z"}`
+	noteASerializedOld     = `{"Note":{"AgeInMonths":0,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteA","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":null,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"Rating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-04T23:19:22.000000022Z"}`
+	noteASerializedNew     = `{"Note":{"AgeInMonths":0,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteA","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":null,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"Rating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-05T11:40:15.000000022Z"}`
+	noteAChangedSerialized = `{"Note":{"AgeInMonths":1,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteA","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":null,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"Rating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-05T11:40:15.000000022Z"}`
+	noteBSerialized        = `{"Note":{"AgeInMonths":0,"AmountBorrowed":0,"BorrowerRate":0,"DaysPastDue":0,"DebtSaleProceedsReceivedProRataShare":0,"InterestPaidProRataShare":0,"IsSold":false,"LateFeesPaidProRataShare":0,"ListingNumber":0,"LoanNoteID":"noteB","LoanNumber":0,"NextPaymentDueAmountProRataShare":0,"NextPaymentDueDate":"0001-01-01T00:00:00Z","NoteDefaultReasonDescription":"","NoteDefaultReason":2,"NoteOwnershipAmount":0,"NoteSaleFeesPaid":0,"NoteSaleGrossAmountReceived":0,"NoteStatusDescription":"","NoteStatus":0,"OriginationDate":"0001-01-01T00:00:00Z","PrincipalBalanceProRataShare":0,"PrincipalPaidProRataShare":0,"ProsperFeesPaidProRataShare":0,"Rating":0,"ServiceFeesPaidProRataShare":0,"Term":0},"Timestamp":"2016-03-05T11:40:15.000000022Z"}`
 	badJSON                = "{{mock bad JSON"
 )
 
 var (
-	bankruptcy   = types.Bankruptcy
-	noteA        = types.Note{LoanNoteID: "noteA", AgeInMonths: 0}
-	noteAChanged = types.Note{LoanNoteID: "noteA", AgeInMonths: 1}
-	noteB        = types.Note{
+	bankruptcy   = prosper.Bankruptcy
+	noteA        = prosper.Note{LoanNoteID: "noteA", AgeInMonths: 0}
+	noteAChanged = prosper.Note{LoanNoteID: "noteA", AgeInMonths: 1}
+	noteB        = prosper.Note{
 		LoanNoteID:        "noteB",
 		NoteDefaultReason: &bankruptcy,
 	}
@@ -74,7 +74,7 @@ var (
 func TestRedisLogger(t *testing.T) {
 	var tests = []struct {
 		startingRedisState map[string][]string
-		updates            []types.Note
+		updates            []prosper.Note
 		lrangeErr          error
 		lpushErr           error
 		wantLPushCalled    bool
@@ -83,7 +83,7 @@ func TestRedisLogger(t *testing.T) {
 	}{
 		{
 			startingRedisState: map[string][]string{},
-			updates:            []types.Note{noteA},
+			updates:            []prosper.Note{noteA},
 			wantLPushCalled:    true,
 			wantEndState: map[string][]string{
 				"note:noteA": {noteASerializedNew},
@@ -92,7 +92,7 @@ func TestRedisLogger(t *testing.T) {
 		},
 		{
 			startingRedisState: map[string][]string{},
-			updates:            []types.Note{noteA, noteB},
+			updates:            []prosper.Note{noteA, noteB},
 			wantLPushCalled:    true,
 			wantEndState: map[string][]string{
 				"note:noteA": {noteASerializedNew},
@@ -104,7 +104,7 @@ func TestRedisLogger(t *testing.T) {
 			startingRedisState: map[string][]string{
 				"note:noteA": {noteASerializedOld},
 			},
-			updates:         []types.Note{noteA},
+			updates:         []prosper.Note{noteA},
 			wantLPushCalled: false,
 			wantEndState: map[string][]string{
 				"note:noteA": {noteASerializedOld},
@@ -115,7 +115,7 @@ func TestRedisLogger(t *testing.T) {
 			startingRedisState: map[string][]string{
 				"note:noteB": {noteBSerialized},
 			},
-			updates:         []types.Note{noteB},
+			updates:         []prosper.Note{noteB},
 			wantLPushCalled: false,
 			wantEndState: map[string][]string{
 				"note:noteB": {noteBSerialized},
@@ -126,7 +126,7 @@ func TestRedisLogger(t *testing.T) {
 			startingRedisState: map[string][]string{
 				"note:noteA": {noteASerializedOld},
 			},
-			updates:         []types.Note{noteAChanged},
+			updates:         []prosper.Note{noteAChanged},
 			wantLPushCalled: true,
 			wantEndState: map[string][]string{
 				"note:noteA": {noteAChangedSerialized, noteASerializedOld},
@@ -135,7 +135,7 @@ func TestRedisLogger(t *testing.T) {
 		},
 		{
 			startingRedisState: map[string][]string{},
-			updates:            []types.Note{noteA},
+			updates:            []prosper.Note{noteA},
 			lrangeErr:          redisErr,
 			wantLPushCalled:    false,
 			wantEndState:       map[string][]string{},
@@ -143,7 +143,7 @@ func TestRedisLogger(t *testing.T) {
 		},
 		{
 			startingRedisState: map[string][]string{},
-			updates:            []types.Note{noteA},
+			updates:            []prosper.Note{noteA},
 			lpushErr:           redisErr,
 			wantLPushCalled:    true,
 			wantEndState:       map[string][]string{},
@@ -151,7 +151,7 @@ func TestRedisLogger(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		noteUpdates := make(chan types.Note)
+		noteUpdates := make(chan prosper.Note)
 		done := make(chan bool)
 		prepender := mockRedisListPrepender{
 			State:     tt.startingRedisState,
@@ -181,13 +181,13 @@ func TestRedisLogger(t *testing.T) {
 
 func TestNoteEqual(t *testing.T) {
 	tests := []struct {
-		a    types.Note
-		b    types.Note
+		a    prosper.Note
+		b    prosper.Note
 		want bool
 	}{
-		{types.Note{}, types.Note{}, true},
+		{prosper.Note{}, prosper.Note{}, true},
 		{
-			a: types.Note{
+			a: prosper.Note{
 				AgeInMonths:                          3,
 				AmountBorrowed:                       7500,
 				BorrowerRate:                         0.3125,
@@ -212,11 +212,11 @@ func TestNoteEqual(t *testing.T) {
 				PrincipalBalanceProRataShare:     7150,
 				PrincipalPaidProRataShare:        0,
 				ProsperFeesPaidProRataShare:      0,
-				ProsperRating:                    6,
-				ServiceFeesPaidProRataShare:      0,
+				Rating: 6,
+				ServiceFeesPaidProRataShare: 0,
 				Term: 36,
 			},
-			b: types.Note{
+			b: prosper.Note{
 				AgeInMonths:                          3,
 				AmountBorrowed:                       7500,
 				BorrowerRate:                         0.3125,
@@ -241,8 +241,8 @@ func TestNoteEqual(t *testing.T) {
 				PrincipalBalanceProRataShare:     7150,
 				PrincipalPaidProRataShare:        0,
 				ProsperFeesPaidProRataShare:      0,
-				ProsperRating:                    6,
-				ServiceFeesPaidProRataShare:      0,
+				Rating: 6,
+				ServiceFeesPaidProRataShare: 0,
 				Term: 36,
 			},
 			want: true,

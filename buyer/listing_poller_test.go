@@ -13,11 +13,11 @@ type mockListingSearcher struct {
 	gotExcludeListingsInvested bool
 	gotSearchFilter            prosper.SearchFilter
 	calls                      int
-	listings                   []types.Listing
+	listings                   []prosper.Listing
 	err                        error
 }
 
-func (ls *mockListingSearcher) Search(sp prosper.SearchParams) (types.SearchResponse, error) {
+func (ls *mockListingSearcher) Search(sp prosper.SearchParams) (prosper.SearchResponse, error) {
 	ls.calls++
 	ls.gotExcludeListingsInvested = sp.ExcludeListingsInvested
 	ls.gotSearchFilter = sp.Filter
@@ -26,17 +26,17 @@ func (ls *mockListingSearcher) Search(sp prosper.SearchParams) (types.SearchResp
 		limit = len(ls.listings)
 	}
 	results := ls.listings[sp.Offset:limit]
-	return types.SearchResponse{
+	return prosper.SearchResponse{
 		Results:     results,
 		ResultCount: len(results),
 		TotalCount:  len(ls.listings),
 	}, ls.err
 }
 
-func makeListings(count int) []types.Listing {
-	listings := []types.Listing{}
+func makeListings(count int) []prosper.Listing {
+	listings := []prosper.Listing{}
 	for i := 0; i < count; i++ {
-		listings = append(listings, types.Listing{ListingNumber: types.ListingNumber(i)})
+		listings = append(listings, prosper.Listing{ListingNumber: prosper.ListingNumber(i)})
 	}
 	return listings
 }
@@ -56,7 +56,7 @@ var (
 
 func TestListingPoller(t *testing.T) {
 	var tests = []struct {
-		serverListings []types.Listing
+		serverListings []prosper.Listing
 		searchFilter   prosper.SearchFilter
 		searchErr      error
 		wantCalls      int
@@ -106,7 +106,7 @@ func TestListingPoller(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		listings := make(chan types.Listing)
+		listings := make(chan prosper.Listing)
 		searcher := mockListingSearcher{
 			listings: tt.serverListings,
 			err:      tt.searchErr,
@@ -119,7 +119,7 @@ func TestListingPoller(t *testing.T) {
 			clock:        mockClock{mockCurrentTime},
 		}
 		go listingPoller.Run()
-		var gotListings []types.Listing
+		var gotListings []prosper.Listing
 		for i := 0; i < len(tt.serverListings); i++ {
 			gotListings = append(gotListings, <-listings)
 		}

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 )
 
 type mockRedisSetter struct {
@@ -31,65 +31,65 @@ const (
 
 var (
 	mockErr       = errors.New("mock error")
-	orderAUpdate1 = types.OrderResponse{
+	orderAUpdate1 = prosper.OrderResponse{
 		OrderID: "id-a",
-		BidStatus: []types.BidStatus{
+		BidStatus: []prosper.BidStatus{
 			{
-				BidRequest: types.BidRequest{
-					ListingID: types.ListingNumber(54321),
+				BidRequest: prosper.BidRequest{
+					ListingID: prosper.ListingNumber(54321),
 					BidAmount: 25.0,
 				},
-				Status:          types.Pending,
-				Result:          types.NoBidResult,
+				Status:          prosper.Pending,
+				Result:          prosper.NoBidResult,
 				BidAmountPlaced: 25.0,
 			},
 		},
-		OrderStatus: types.OrderInProgress,
+		OrderStatus: prosper.OrderInProgress,
 		OrderDate:   time.Date(2016, 4, 23, 11, 54, 29, 0, time.UTC),
 	}
-	orderAUpdate2 = types.OrderResponse{
+	orderAUpdate2 = prosper.OrderResponse{
 		OrderID: "id-a",
-		BidStatus: []types.BidStatus{
+		BidStatus: []prosper.BidStatus{
 			{
-				BidRequest: types.BidRequest{
-					ListingID: types.ListingNumber(54321),
+				BidRequest: prosper.BidRequest{
+					ListingID: prosper.ListingNumber(54321),
 					BidAmount: 25.0,
 				},
-				Status:          types.Pending,
-				Result:          types.BidSucceeded,
+				Status:          prosper.Pending,
+				Result:          prosper.BidSucceeded,
 				BidAmountPlaced: 25.0,
 			},
 		},
-		OrderStatus: types.OrderInProgress,
+		OrderStatus: prosper.OrderInProgress,
 		OrderDate:   time.Date(2016, 4, 23, 11, 54, 29, 0, time.UTC),
 	}
-	orderB = types.OrderResponse{
+	orderB = prosper.OrderResponse{
 		OrderID: "id-b",
-		BidStatus: []types.BidStatus{
+		BidStatus: []prosper.BidStatus{
 			{
-				BidRequest: types.BidRequest{
-					ListingID: types.ListingNumber(987654),
+				BidRequest: prosper.BidRequest{
+					ListingID: prosper.ListingNumber(987654),
 					BidAmount: 37.50,
 				},
-				Status:          types.Pending,
-				Result:          types.BidFailed,
+				Status:          prosper.Pending,
+				Result:          prosper.BidFailed,
 				BidAmountPlaced: 37.50,
 			},
 		},
-		OrderStatus: types.OrderInProgress,
+		OrderStatus: prosper.OrderInProgress,
 		OrderDate:   time.Date(2016, 3, 25, 20, 18, 4, 36, time.UTC),
 	}
 )
 
 func TestRedisLogger(t *testing.T) {
 	var tests = []struct {
-		updates    []types.OrderResponse
+		updates    []prosper.OrderResponse
 		setErrs    []error
 		wantValues map[string]string
 		msg        string
 	}{
 		{
-			updates: []types.OrderResponse{orderAUpdate1},
+			updates: []prosper.OrderResponse{orderAUpdate1},
 			setErrs: []error{nil},
 			wantValues: map[string]string{
 				"order:id-a": orderAUpdate1Serialized,
@@ -97,7 +97,7 @@ func TestRedisLogger(t *testing.T) {
 			msg: "single update should add a single value to redis",
 		},
 		{
-			updates: []types.OrderResponse{orderAUpdate1, orderAUpdate2},
+			updates: []prosper.OrderResponse{orderAUpdate1, orderAUpdate2},
 			setErrs: []error{nil, nil},
 			wantValues: map[string]string{
 				"order:id-a": orderAUpdate2Serialized,
@@ -105,7 +105,7 @@ func TestRedisLogger(t *testing.T) {
 			msg: "multiple updates to same order should add a single value to redis",
 		},
 		{
-			updates: []types.OrderResponse{orderAUpdate1, orderAUpdate2},
+			updates: []prosper.OrderResponse{orderAUpdate1, orderAUpdate2},
 			setErrs: []error{mockErr, nil},
 			wantValues: map[string]string{
 				"order:id-a": orderAUpdate2Serialized,
@@ -113,7 +113,7 @@ func TestRedisLogger(t *testing.T) {
 			msg: "errors setting redis values should be ignored",
 		},
 		{
-			updates: []types.OrderResponse{orderAUpdate1, orderAUpdate2, orderB},
+			updates: []prosper.OrderResponse{orderAUpdate1, orderAUpdate2, orderB},
 			setErrs: []error{nil, nil, nil},
 			wantValues: map[string]string{
 				"order:id-a": orderAUpdate2Serialized,
@@ -123,7 +123,7 @@ func TestRedisLogger(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		orderUpdates := make(chan types.OrderResponse)
+		orderUpdates := make(chan prosper.OrderResponse)
 		done := make(chan bool)
 		mockSetter := mockRedisSetter{
 			Values:  map[string]string{},

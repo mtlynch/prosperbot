@@ -1,6 +1,9 @@
 package buyer
 
-import "github.com/mtlynch/gofn-prosper/types"
+import (
+	"github.com/mtlynch/gofn-prosper/prosper"
+	"github.com/mtlynch/gofn-prosper/types"
+)
 
 type ClientSideFilter struct {
 	PriorProsperLoansLatePaymentsOneMonthPlus types.Int32Range
@@ -10,7 +13,7 @@ type ClientSideFilter struct {
 	EmploymentStatusDescriptionBlacklist      []string
 }
 
-func (csf ClientSideFilter) Filter(l types.Listing) bool {
+func (csf ClientSideFilter) Filter(l prosper.Listing) bool {
 	if !isInInt32Range(csf.PriorProsperLoansLatePaymentsOneMonthPlus, int32(l.PriorProsperLoansLatePaymentsOneMonthPlus)) {
 		return false
 	}

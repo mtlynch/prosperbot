@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 
 	"github.com/mtlynch/prosperbot/redis"
 )
@@ -55,53 +55,53 @@ const (
 )
 
 var (
-	updateA = types.AccountInformation{AvailableCashBalance: 100.0}
-	updateB = types.AccountInformation{AvailableCashBalance: 125.5}
+	updateA = prosper.AccountInformation{AvailableCashBalance: 100.0}
+	updateB = prosper.AccountInformation{AvailableCashBalance: 125.5}
 )
 
 func TestRedisLogger(t *testing.T) {
 	var tests = []struct {
 		startingList    []string
-		updates         []types.AccountInformation
+		updates         []prosper.AccountInformation
 		lpushErr        error
 		wantLPushCalled bool
 		wantList        []string
 		msg             string
 	}{
 		{
-			updates:         []types.AccountInformation{updateA},
+			updates:         []prosper.AccountInformation{updateA},
 			wantLPushCalled: true,
 			wantList:        []string{updateASerializedNew},
 			msg:             "any update should cause a save when no history exists",
 		},
 		{
 			startingList:    []string{badJSON},
-			updates:         []types.AccountInformation{updateA},
+			updates:         []prosper.AccountInformation{updateA},
 			wantLPushCalled: true,
 			wantList:        []string{updateASerializedNew, badJSON},
 			msg:             "error on retrieving latest info should be treated as empty history",
 		},
 		{
 			startingList: []string{updateASerializedOld},
-			updates:      []types.AccountInformation{updateA},
+			updates:      []prosper.AccountInformation{updateA},
 			wantList:     []string{updateASerializedOld},
 			msg:          "an update that is identical to latest data should not cause a save",
 		},
 		{
 			startingList:    []string{updateASerializedOld},
-			updates:         []types.AccountInformation{updateB},
+			updates:         []prosper.AccountInformation{updateB},
 			wantLPushCalled: true,
 			wantList:        []string{updateBSerializedNew, updateASerializedOld},
 			msg:             "an update that differs from to latest data should cause a save",
 		},
 		{
-			updates:         []types.AccountInformation{updateA, updateA, updateB},
+			updates:         []prosper.AccountInformation{updateA, updateA, updateB},
 			wantLPushCalled: true,
 			wantList:        []string{updateBSerializedNew, updateASerializedNew},
 			msg:             "an update of A, A, B should result in saves of A and B",
 		},
 		{
-			updates:         []types.AccountInformation{updateA, updateA, updateB},
+			updates:         []prosper.AccountInformation{updateA, updateA, updateB},
 			lpushErr:        errors.New("mock LPush error"),
 			wantLPushCalled: true,
 			wantList:        []string{updateBSerializedNew, updateASerializedNew, updateASerializedNew},
@@ -109,7 +109,7 @@ func TestRedisLogger(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		accountUpdates := make(chan types.AccountInformation)
+		accountUpdates := make(chan prosper.AccountInformation)
 		prepender := mockRedisListPrepender{
 			List:     tt.startingList,
 			LPushErr: tt.lpushErr,

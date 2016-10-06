@@ -8,8 +8,8 @@ import (
 )
 
 type listingBuyer struct {
-	listings  <-chan types.Listing
-	orders    chan<- types.OrderID
+	listings  <-chan prosper.Listing
+	orders    chan<- prosper.OrderID
 	bidPlacer prosper.BidPlacer
 	bidAmount float64
 }

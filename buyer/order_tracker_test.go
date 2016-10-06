@@ -5,18 +5,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtlynch/gofn-prosper/types"
+	"github.com/mtlynch/gofn-prosper/prosper"
 )
 
 type mockOrderStatusQuerier struct {
-	gotOrderID    types.OrderID
-	orderStatuses []types.OrderResponse
+	gotOrderID    prosper.OrderID
+	orderStatuses []prosper.OrderResponse
 	errs          []error
 }
 
-func (bp *mockOrderStatusQuerier) OrderStatus(orderID types.OrderID) (types.OrderResponse, error) {
+func (bp *mockOrderStatusQuerier) OrderStatus(orderID prosper.OrderID) (prosper.OrderResponse, error) {
 	bp.gotOrderID = orderID
-	var orderStatus types.OrderResponse
+	var orderStatus prosper.OrderResponse
 	orderStatus, bp.orderStatuses = bp.orderStatuses[0], bp.orderStatuses[1:]
 	var err error
 	err, bp.errs = bp.errs[0], bp.errs[1:]
@@ -28,68 +28,68 @@ func (bp *mockOrderStatusQuerier) OrderStatus(orderID types.OrderID) (types.Orde
 }
 
 var (
-	orderStatusA = types.OrderResponse{
-		OrderStatus: types.OrderInProgress,
-		BidStatus:   []types.BidStatus{{Result: types.NoBidResult}},
+	orderStatusA = prosper.OrderResponse{
+		OrderStatus: prosper.OrderInProgress,
+		BidStatus:   []prosper.BidStatus{{Result: prosper.NoBidResult}},
 	}
-	orderStatusB = types.OrderResponse{
-		OrderStatus: types.OrderCompleted,
-		BidStatus:   []types.BidStatus{{Result: types.BidFailed}},
+	orderStatusB = prosper.OrderResponse{
+		OrderStatus: prosper.OrderCompleted,
+		BidStatus:   []prosper.BidStatus{{Result: prosper.BidFailed}},
 	}
-	orderStatusC = types.OrderResponse{
-		OrderStatus: types.OrderInProgress,
-		BidStatus:   []types.BidStatus{{Result: types.BidSucceeded}},
+	orderStatusC = prosper.OrderResponse{
+		OrderStatus: prosper.OrderInProgress,
+		BidStatus:   []prosper.BidStatus{{Result: prosper.BidSucceeded}},
 	}
 )
 
 func TestOrderStatusQueryWorker(t *testing.T) {
 	var tests = []struct {
-		orderID              types.OrderID
-		emittedOrderStatuses []types.OrderResponse
+		orderID              prosper.OrderID
+		emittedOrderStatuses []prosper.OrderResponse
 		emittedErrs          []error
-		wantOrderStatuses    []types.OrderResponse
+		wantOrderStatuses    []prosper.OrderResponse
 		msg                  string
 	}{
 		{
 			orderID:              orderIDA,
-			emittedOrderStatuses: []types.OrderResponse{orderStatusB},
+			emittedOrderStatuses: []prosper.OrderResponse{orderStatusB},
 			emittedErrs:          []error{nil},
-			wantOrderStatuses:    []types.OrderResponse{orderStatusB},
+			wantOrderStatuses:    []prosper.OrderResponse{orderStatusB},
 			msg:                  "if first status is completed, we're done immediately",
 		},
 		{
 			orderID:              orderIDB,
-			emittedOrderStatuses: []types.OrderResponse{orderStatusB},
+			emittedOrderStatuses: []prosper.OrderResponse{orderStatusB},
 			emittedErrs:          []error{nil},
-			wantOrderStatuses:    []types.OrderResponse{orderStatusB},
+			wantOrderStatuses:    []prosper.OrderResponse{orderStatusB},
 			msg:                  "verify we're passing along the correct order ID",
 		},
 		{
 			orderID:              orderIDA,
-			emittedOrderStatuses: []types.OrderResponse{orderStatusA, orderStatusA, orderStatusB},
+			emittedOrderStatuses: []prosper.OrderResponse{orderStatusA, orderStatusA, orderStatusB},
 			emittedErrs:          []error{nil, nil, nil},
-			wantOrderStatuses:    []types.OrderResponse{orderStatusA, orderStatusA, orderStatusB},
+			wantOrderStatuses:    []prosper.OrderResponse{orderStatusA, orderStatusA, orderStatusB},
 			msg:                  "query until we get a completed status",
 		},
 		{
 			orderID:              orderIDA,
-			emittedOrderStatuses: []types.OrderResponse{orderStatusA, orderStatusA, orderStatusC},
+			emittedOrderStatuses: []prosper.OrderResponse{orderStatusA, orderStatusA, orderStatusC},
 			emittedErrs:          []error{nil, nil, nil},
-			wantOrderStatuses:    []types.OrderResponse{orderStatusA, orderStatusA, orderStatusC},
+			wantOrderStatuses:    []prosper.OrderResponse{orderStatusA, orderStatusA, orderStatusC},
 			msg:                  "query until we get a completed bid result",
 		},
 		{
 			orderID:              orderIDA,
-			emittedOrderStatuses: []types.OrderResponse{orderStatusA, orderStatusA, orderStatusB},
+			emittedOrderStatuses: []prosper.OrderResponse{orderStatusA, orderStatusA, orderStatusB},
 			emittedErrs:          []error{genericErr, genericErr, genericErr},
-			wantOrderStatuses:    []types.OrderResponse{},
+			wantOrderStatuses:    []prosper.OrderResponse{},
 			msg:                  "don't pass along error responses and error out after three",
 		},
 		{
 			orderID:              orderIDA,
-			emittedOrderStatuses: []types.OrderResponse{orderStatusA, orderStatusA, orderStatusA, orderStatusB},
+			emittedOrderStatuses: []prosper.OrderResponse{orderStatusA, orderStatusA, orderStatusA, orderStatusB},
 			emittedErrs:          []error{genericErr, genericErr, nil, nil},
-			wantOrderStatuses:    []types.OrderResponse{orderStatusA, orderStatusB},
+			wantOrderStatuses:    []prosper.OrderResponse{orderStatusA, orderStatusB},
 			msg:                  "if there are only two errors, recover",
 		},
 	}
@@ -98,13 +98,13 @@ func TestOrderStatusQueryWorker(t *testing.T) {
 			orderStatuses: tt.emittedOrderStatuses,
 			errs:          tt.emittedErrs,
 		}
-		orderStatuses := make(chan types.OrderResponse)
+		orderStatuses := make(chan prosper.OrderResponse)
 		queryWorker := orderStatusQueryWorker{
 			querier:      &orderQuerier,
 			orderUpdates: orderStatuses,
 		}
 		queryWorker.QueryUntilComplete(tt.orderID)
-		gotOrderStatuses := []types.OrderResponse{}
+		gotOrderStatuses := []prosper.OrderResponse{}
 		for i := 0; i < len(tt.wantOrderStatuses); i++ {
 			gotOrderStatuses = append(gotOrderStatuses, <-orderStatuses)
 		}

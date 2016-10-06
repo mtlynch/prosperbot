@@ -6,19 +6,20 @@ import (
 	"log"
 	"reflect"
 
+	"github.com/mtlynch/gofn-prosper/prosper"
 	"github.com/mtlynch/gofn-prosper/types"
 
 	"github.com/mtlynch/prosperbot/redis"
 )
 
 type redisLogger struct {
-	noteUpdates <-chan types.Note
+	noteUpdates <-chan prosper.Note
 	done        chan<- bool
 	redis       redis.RedisListPrepender
 	clock       types.Clock
 }
 
-func newRedisLogger(noteUpdates <-chan types.Note) (redisLogger, error) {
+func newRedisLogger(noteUpdates <-chan prosper.Note) (redisLogger, error) {
 	r, err := redis.New()
 	if err != nil {
 		return redisLogger{}, err
@@ -32,7 +33,7 @@ func newRedisLogger(noteUpdates <-chan types.Note) (redisLogger, error) {
 
 var errNotFound = errors.New("note not found")
 
-func noteEqual(a, b types.Note) bool {
+func noteEqual(a, b prosper.Note) bool {
 	if a.AgeInMonths != b.AgeInMonths {
 		return false
 	}
@@ -105,7 +106,7 @@ func noteEqual(a, b types.Note) bool {
 	if a.ProsperFeesPaidProRataShare != b.ProsperFeesPaidProRataShare {
 		return false
 	}
-	if a.ProsperRating != b.ProsperRating {
+	if a.Rating != b.Rating {
 		return false
 	}
 	if a.ServiceFeesPaidProRataShare != b.ServiceFeesPaidProRataShare {
@@ -117,7 +118,7 @@ func noteEqual(a, b types.Note) bool {
 	return true
 }
 
-func NewRedisLogger(updates <-chan types.Note) (redisLogger, error) {
+func NewRedisLogger(updates <-chan prosper.Note) (redisLogger, error) {
 	r, err := redis.New()
 	if err != nil {
 		return redisLogger{}, err
@@ -157,27 +158,27 @@ func (r redisLogger) Run() {
 	}
 }
 
-func noteToKey(n types.Note) string {
+func noteToKey(n prosper.Note) string {
 	return redis.KeyPrefixNote + n.LoanNoteID
 }
 
-func (r redisLogger) getLatestNoteState(n types.Note) (types.Note, error) {
+func (r redisLogger) getLatestNoteState(n prosper.Note) (prosper.Note, error) {
 	noteSerialized, err := r.redis.LRange(noteToKey(n), 0, 0)
 	if err != nil {
-		return types.Note{}, err
+		return prosper.Note{}, err
 	}
 	if len(noteSerialized) < 1 {
-		return types.Note{}, errNotFound
+		return prosper.Note{}, errNotFound
 	}
 	var record redis.NoteRecord
 	err = json.Unmarshal([]byte(noteSerialized[0]), &record)
 	if err != nil {
-		return types.Note{}, err
+		return prosper.Note{}, err
 	}
 	return record.Note, nil
 }
 
-func (r redisLogger) saveNoteState(n types.Note) error {
+func (r redisLogger) saveNoteState(n prosper.Note) error {
 	record := redis.NoteRecord{
 		Note:      n,
 		Timestamp: r.clock.Now(),

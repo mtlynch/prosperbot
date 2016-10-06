@@ -13,10 +13,10 @@ import (
 // whitelist employment statuses.
 
 func Poll(checkInterval time.Duration, f prosper.SearchFilter, isBuyingEnabled bool, c *prosper.Client) error {
-	allListings := make(chan types.Listing)
-	newListings := make(chan types.Listing)
-	orders := make(chan types.OrderID)
-	orderUpdates := make(chan types.OrderResponse)
+	allListings := make(chan prosper.Listing)
+	newListings := make(chan prosper.Listing)
+	orders := make(chan prosper.OrderID)
+	orderUpdates := make(chan prosper.OrderResponse)
 	listingPoller := listingPoller{
 		s:            c,
 		searchFilter: f,
