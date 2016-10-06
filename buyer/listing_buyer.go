@@ -43,7 +43,10 @@ func (lb listingBuyer) Run() {
 		}
 
 		// TODO: Add in retries.
-		orderResponse, err := lb.bidPlacer.PlaceBid(listing.ListingNumber, lb.bidAmount)
+		orderResponse, err := lb.bidPlacer.PlaceBid(prosper.BidRequest{
+			ListingID: listing.ListingNumber,
+			BidAmount: lb.bidAmount,
+		})
 		if err != nil {
 			log.Printf("failed to place bid on listing %v: %v", listing.ListingNumber, err)
 			continue
