@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
+	"github.com/mtlynch/gofn-prosper/prosper/auth"
 	"github.com/mtlynch/gofn-prosper/types"
 
 	"github.com/mtlynch/prosperbot/account"
@@ -15,14 +16,14 @@ import (
 	"github.com/mtlynch/prosperbot/notes"
 )
 
-func parseCredentials(path string) (creds types.ClientCredentials, err error) {
+func parseCredentials(path string) (creds auth.ClientCredentials, err error) {
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		return types.ClientCredentials{}, err
+		return auth.ClientCredentials{}, err
 	}
 	err = json.Unmarshal(file, &creds)
 	if err != nil {
-		return types.ClientCredentials{}, err
+		return auth.ClientCredentials{}, err
 	}
 	return creds, nil
 }
