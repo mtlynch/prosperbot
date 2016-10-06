@@ -3,8 +3,8 @@ package buyer
 import (
 	"log"
 
+	"github.com/mtlynch/gofn-prosper/interval"
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 type listingBuyer struct {
@@ -16,17 +16,17 @@ type listingBuyer struct {
 
 func (lb listingBuyer) Run() {
 	csf := ClientSideFilter{
-		PriorProsperLoansLatePaymentsOneMonthPlus: types.Int32Range{
-			Max: types.CreateInt32(0),
+		PriorProsperLoansLatePaymentsOneMonthPlus: interval.Int32Range{
+			Max: interval.CreateInt32(0),
 		},
-		PriorProsperLoansBalanceOutstanding: types.Float64Range{
-			Max: types.CreateFloat64(0.0),
+		PriorProsperLoansBalanceOutstanding: interval.Float64Range{
+			Max: interval.CreateFloat64(0.0),
 		},
-		CurrentDelinquencies: types.Int32Range{
-			Max: types.CreateInt32(0),
+		CurrentDelinquencies: interval.Int32Range{
+			Max: interval.CreateInt32(0),
 		},
-		InquiriesLast6Months: types.Int32Range{
-			Max: types.CreateInt32(3),
+		InquiriesLast6Months: interval.Int32Range{
+			Max: interval.CreateInt32(3),
 		},
 		EmploymentStatusDescriptionBlacklist: []string{
 			"Unemployed", "Not Available",

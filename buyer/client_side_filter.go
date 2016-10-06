@@ -1,15 +1,15 @@
 package buyer
 
 import (
+	"github.com/mtlynch/gofn-prosper/interval"
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 )
 
 type ClientSideFilter struct {
-	PriorProsperLoansLatePaymentsOneMonthPlus types.Int32Range
-	PriorProsperLoansBalanceOutstanding       types.Float64Range
-	CurrentDelinquencies                      types.Int32Range
-	InquiriesLast6Months                      types.Int32Range
+	PriorProsperLoansLatePaymentsOneMonthPlus interval.Int32Range
+	PriorProsperLoansBalanceOutstanding       interval.Float64Range
+	CurrentDelinquencies                      interval.Int32Range
+	InquiriesLast6Months                      interval.Int32Range
 	EmploymentStatusDescriptionBlacklist      []string
 }
 
@@ -34,7 +34,7 @@ func (csf ClientSideFilter) Filter(l prosper.Listing) bool {
 	return true
 }
 
-func isInInt32Range(r types.Int32Range, v int32) bool {
+func isInInt32Range(r interval.Int32Range, v int32) bool {
 	if r.Max != nil && v > *r.Max {
 		return false
 	}
@@ -44,7 +44,7 @@ func isInInt32Range(r types.Int32Range, v int32) bool {
 	return true
 }
 
-func isInFloat64Range(r types.Float64Range, v float64) bool {
+func isInFloat64Range(r interval.Float64Range, v float64) bool {
 	if r.Max != nil && v > *r.Max {
 		return false
 	}
