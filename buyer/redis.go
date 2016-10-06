@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
-	"github.com/mtlynch/gofn-prosper/types"
 
+	"github.com/mtlynch/prosperbot/clock"
 	"github.com/mtlynch/prosperbot/redis"
 )
 
@@ -14,7 +14,7 @@ type orderStatusLogger struct {
 	redis        redis.RedisSetter
 	orderUpdates <-chan prosper.OrderResponse
 	done         chan<- bool
-	clock        types.Clock
+	clock        clock.Clock
 }
 
 func NewOrderStatusLogger(orderUpdates <-chan prosper.OrderResponse) (orderStatusLogger, error) {
@@ -27,7 +27,7 @@ func NewOrderStatusLogger(orderUpdates <-chan prosper.OrderResponse) (orderStatu
 		redis:        r,
 		orderUpdates: orderUpdates,
 		done:         done,
-		clock:        types.DefaultClock{},
+		clock:        clock.DefaultClock{},
 	}, nil
 }
 
