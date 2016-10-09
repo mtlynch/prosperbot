@@ -30,7 +30,7 @@ func parseCredentials(path string) (creds auth.ClientCredentials, err error) {
 
 func main() {
 	log.Println("Starting up!")
-	credsPath := flag.String("creds", "/opt/prosper-creds.json", "client credentials file")
+	credsPath := flag.String("creds", "prosper-creds.json", "Prosper client credentials file")
 	isBuyingEnabled := flag.Bool("enable-buying", false, "is listing buying enabled?")
 	flag.Parse()
 	creds, err := parseCredentials(*credsPath)
