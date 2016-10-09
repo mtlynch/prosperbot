@@ -13,7 +13,7 @@ import (
 // employment status. Do I actually need to do this? Maybe I can just
 // whitelist employment statuses.
 
-func Poll(checkInterval time.Duration, f prosper.SearchFilter, isBuyingEnabled bool, c *prosper.Client) error {
+func Poll(checkInterval time.Duration, f prosper.SearchFilter, isBuyingEnabled bool, c prosper.Client) error {
 	allListings := make(chan prosper.Listing)
 	newListings := make(chan prosper.Listing)
 	orders := make(chan prosper.OrderID)

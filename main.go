@@ -53,9 +53,9 @@ func main() {
 		DtiWprosperLoan:      interval.Float64Range{Max: interval.CreateFloat64(0.4)},
 		Rating:               []prosper.Rating{prosper.RatingAA, prosper.RatingA, prosper.RatingB, prosper.RatingC, prosper.RatingD, prosper.RatingE},
 	}
-	buyer.Poll(1*time.Second, f, *isBuyingEnabled, &c)
-	account.Poll(1*time.Minute, &c)
-	notes.Poll(10*time.Minute, &c)
+	buyer.Poll(1*time.Second, f, *isBuyingEnabled, c)
+	account.Poll(1*time.Minute, c)
+	notes.Poll(10*time.Minute, c)
 	for {
 		time.Sleep(10 * time.Minute)
 	}
