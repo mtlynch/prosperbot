@@ -30,7 +30,10 @@ func NewSeenListingFilter(listings <-chan prosper.Listing, newListings chan<- pr
 
 func (r seenListingFilter) Run() {
 	for {
-		listing := <-r.listings
+		listing, more := <-r.listings
+		if !more {
+			break
+		}
 		isNew, err := r.saveListing(listing)
 		if err != nil {
 			log.Printf("failed to save listing: %v", err)

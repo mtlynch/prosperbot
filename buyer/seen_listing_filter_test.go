@@ -2,6 +2,7 @@ package buyer
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 
 	"github.com/mtlynch/gofn-prosper/prosper"
@@ -30,6 +31,14 @@ var (
 	listingB = prosper.Listing{ListingNumber: 456}
 )
 
+// byListingNumber implements sort.Interface for []propser.Listing based on the
+// ListingNumber field.
+type byListingNumber []prosper.Listing
+
+func (b byListingNumber) Len() int           { return len(b) }
+func (b byListingNumber) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b byListingNumber) Less(i, j int) bool { return b[i].ListingNumber < b[j].ListingNumber }
+
 func TestSeenListingFilter(t *testing.T) {
 	var tests = []struct {
 		redisStartingValues map[string]string
@@ -48,13 +57,13 @@ func TestSeenListingFilter(t *testing.T) {
 			redisStartingValues: make(map[string]string),
 			listings:            []prosper.Listing{listingA, listingA, listingA},
 			wantNewListings:     []prosper.Listing{listingA},
-			msg:                 "repeated instances of same listing should not pass filter",
+			msg:                 "repeated, consecutive instances of same listing should not pass filter",
 		},
 		{
 			redisStartingValues: make(map[string]string),
 			listings:            []prosper.Listing{listingA, listingB, listingA},
 			wantNewListings:     []prosper.Listing{listingA, listingB},
-			msg:                 "repeated instances of same listing should not pass filter",
+			msg:                 "repeated, nonconsecutive instances of same listing should not pass filter",
 		},
 		{
 			redisStartingValues: map[string]string{
@@ -78,14 +87,18 @@ func TestSeenListingFilter(t *testing.T) {
 			newListings: newListings,
 			redis:       &setNXer,
 		}
-		go filter.Run()
-		for _, u := range tt.listings {
-			listings <- u
-		}
+		go func() {
+			for _, u := range tt.listings {
+				listings <- u
+			}
+			close(listings)
+		}()
+		filter.Run()
 		gotNewListings := []prosper.Listing{}
 		for i := 0; i < len(tt.wantNewListings); i++ {
 			gotNewListings = append(gotNewListings, <-newListings)
 		}
+		sort.Sort(byListingNumber(gotNewListings))
 		if !reflect.DeepEqual(gotNewListings, tt.wantNewListings) {
 			t.Errorf("%s: unexpected new listings. got = %+v, want = %+v", tt.msg, gotNewListings, tt.wantNewListings)
 		}
